@@ -1,22 +1,80 @@
-# Copy this configuration to your ~/.zshrc file
-# This is the complete configuration for the ultimate terminal setup
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
-# Path to your Oh My Zsh installation
+# Path to your Oh My Zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
-# Theme - Powerlevel10k for beautiful prompts
-ZSH_THEME="powerlevel10k/powerlevel10k"
+# AI Agent Detection - Use simple theme for better compatibility
+# Detects: Cursor Agent, Claude Code, GitHub Copilot CLI, and other AI tools
+if [[ -n "$CURSOR_AGENT" ]] || [[ -n "$CLAUDE_CODE" ]] || [[ -n "$COPILOT_CLI" ]] || [[ -n "$AI_AGENT" ]]; then
+    # Use simple theme for AI agents
+    ZSH_THEME="robbyrussell"
+    export AI_AGENT_MODE=1
+else
+    # Use Powerlevel10k for regular terminal use
+    ZSH_THEME="powerlevel10k/powerlevel10k"
+fi
 
-# Auto-update behavior
-zstyle ':omz:update' mode auto
+# Set list of themes to pick from when loading at random
+# Setting this variable when ZSH_THEME=random will cause zsh to load
+# a theme from this variable instead of looking in $ZSH/themes/
+# If set to an empty array, this variable will have no effect.
+# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
 
-# Enable command auto-correction
-ENABLE_CORRECTION="true"
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
 
-# Display red dots whilst waiting for completion
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
+
+# Uncomment one of the following lines to change the auto-update behavior
+# zstyle ':omz:update' mode disabled  # disable automatic updates
+zstyle ':omz:update' mode auto      # update automatically without asking
+# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+
+# Uncomment the following line to change how often to auto-update (in days).
+# zstyle ':omz:update' frequency 13
+
+# Uncomment the following line if pasting URLs and other text is messed up.
+# DISABLE_MAGIC_FUNCTIONS="true"
+
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
+
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment the following line to enable command auto-correction.
+# ENABLE_CORRECTION="true"
+
+# Uncomment the following line to display red dots whilst waiting for completion.
+# You can also set it to another string to have that shown instead of the default red dots.
+# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
+# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
 COMPLETION_WAITING_DOTS="true"
 
-# Plugins - These provide the core functionality
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# You can set one of the optional three formats:
+# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# or set a custom format using the strftime function format specifications,
+# see 'man strftime' for details.
+# HIST_STAMPS="mm/dd/yyyy"
+
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
+
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
   docker
@@ -40,7 +98,40 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration starts here
+# User configuration
+
+# export MANPATH="/usr/local/man:$MANPATH"
+
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='nvim'
+# fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch $(uname -m)"
+
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+# export CLAUDE_CODE_USE_VERTEX=1
+# export CLOUD_ML_REGION=us-east5
+# export ANTHROPIC_VERTEX_PROJECT_ID=primal-insight-413007
+export GOOGLE_APPLICATION_CREDENTIALS='/Users/codebat/Documents/creds/service_account.json'
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Better history configuration
 export HISTSIZE=100000
@@ -207,13 +298,62 @@ ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 # TheFuck
 eval $(thefuck --alias)
 
-# Enable Powerlevel10k instant prompt
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# Enable Powerlevel10k instant prompt only when not in AI agent mode
+if [[ -z "$AI_AGENT_MODE" ]]; then
+    # Initialization code that may require console input (password prompts, [y/n]
+    # confirmations, etc.) must go above this block; everything else may go below.
+    if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+      source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+    fi
+    
+    # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+    [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+else
+    # Simple prompt for AI agents
+    export PS1='%n@%m %1~ %# '
 fi
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+. "$HOME/.local/bin/env"
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
-# FZF
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/codebat/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/codebat/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/codebat/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/codebat/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+export DYLD_FALLBACK_LIBRARY_PATH="$(brew --prefix)/lib:$(brew --prefix pango)/lib:$(brew --prefix cairo)/lib:$(brew --prefix gdk-pixbuf)/lib"
+
+
+# bun completions
+[ -s "/Users/codebat/.bun/_bun" ] && source "/Users/codebat/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Added by Antigravity
+export PATH="/Users/codebat/.antigravity/antigravity/bin:$PATH"
+
+killport() {
+  local pids=$(lsof -ti:$1)
+  if [ -z "$pids" ]; then
+    echo "No process running on port $1"
+  else
+    echo "$pids" | xargs kill -9
+    echo "Killed process(es) on port $1"
+  fi
+}
+if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+
+# Claude Code MCP helpers
+source ~/.claude/mcp-optional/mcp-add.sh 2>/dev/null  # adds: mcp-add command
+alias mcp-clean='pkill -f "whatsapp-mcp.*python3" 2>/dev/null; echo "Cleaned orphan MCPs"'
+
+# Auto-update Claude skills (once per day, silent)
+if [[ -d ~/.claude/skills/.git ]]; then
+  _skills_marker=~/.claude/skills/.last_pull
+  if [[ ! -f "$_skills_marker" || $(find "$_skills_marker" -mtime +0 2>/dev/null) ]]; then
+    git -C ~/.claude/skills pull --ff-only -q 2>/dev/null &
+    touch "$_skills_marker"
+  fi
+fi
