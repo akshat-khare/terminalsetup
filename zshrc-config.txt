@@ -347,7 +347,7 @@ if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)
 
 # Claude Code MCP helpers
 source ~/.claude/mcp-optional/mcp-add.sh 2>/dev/null  # adds: mcp-add command
-alias mcp-clean='pkill -f "whatsapp-mcp.*python3" 2>/dev/null; echo "Cleaned orphan MCPs"'
+alias mcp-clean='echo "Before: $(ps aux | grep -c "[p]ostgres-mcp\|[m]cp.*server\|[w]hatsapp-mcp") MCP processes"; pkill -9 -f "postgres-mcp" 2>/dev/null; pkill -9 -f "whatsapp-mcp" 2>/dev/null; pkill -9 -f "context7-mcp" 2>/dev/null; pkill -9 -f "gcloud-mcp" 2>/dev/null; pkill -9 -f "@azure/mcp" 2>/dev/null; sleep 1; echo "After: $(ps aux | grep -c "[p]ostgres-mcp\|[m]cp.*server\|[w]hatsapp-mcp") MCP processes"; echo "MCP cleanup done"'
 
 # Auto-update Claude skills (once per day, silent)
 if [[ -d ~/.claude/skills/.git ]]; then
