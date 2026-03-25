@@ -35,8 +35,7 @@ Transform your terminal into a powerful, beautiful, and efficient development en
 
 ### Quick Install (One Command)
 ```bash
-# Install everything at once
-curl -fsSL https://raw.githubusercontent.com/yourusername/terminal-setup/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/akshat-khare/terminalsetup/master/install-script.sh | bash
 ```
 
 ### Manual Installation
