@@ -349,26 +349,26 @@ if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)
 source ~/.claude/mcp-optional/mcp-add.sh 2>/dev/null  # adds: mcp-add command
 mcp-clean() {
   local orphans=()
-  local active_claude_pids=($(ps -eo pid,comm | awk '$2=="claude" {print $1}'))
-  # Find MCP processes whose top-level parent is NOT a living claude process
   while IFS= read -r line; do
     local pid=$(echo "$line" | awk '{print $1}')
     local ppid=$(echo "$line" | awk '{print $2}')
-    # Walk up the process tree to find if any ancestor is a claude process
+    # Walk up the process tree — if a launcher (uv/npm/node/python) has ppid=1,
+    # it was reparented to launchd because its parent tool died = orphan
     local cur=$ppid
-    local is_orphan=true
+    local is_orphan=false
     while [[ $cur -gt 1 ]]; do
-      local parent_comm=$(ps -o comm= -p $cur 2>/dev/null)
-      if [[ "$parent_comm" == "claude" ]]; then
-        is_orphan=false
+      local cur_ppid=$(ps -o ppid= -p $cur 2>/dev/null | tr -d ' ')
+      [[ -z "$cur_ppid" ]] && { is_orphan=true; break; }  # parent died
+      if [[ "$cur_ppid" -eq 1 ]]; then
+        local cur_comm=$(ps -o comm= -p $cur 2>/dev/null)
+        case "$cur_comm" in
+          uv|npm|npx|node|python*) is_orphan=true ;;  # reparented launcher = orphan
+        esac
         break
       fi
-      cur=$(ps -o ppid= -p $cur 2>/dev/null | tr -d ' ')
-      [[ -z "$cur" ]] && break
+      cur=$cur_ppid
     done
-    if $is_orphan; then
-      orphans+=($pid)
-    fi
+    $is_orphan && orphans+=($pid)
   done < <(ps -eo pid,ppid,command | grep -E "[p]ostgres-mcp|[c]ontext7-mcp|[g]cloud-mcp|@azure/mcp|[w]hatsapp-mcp|[l]angsmith-mcp|[m]cp-grafana")
   if [[ ${#orphans[@]} -eq 0 ]]; then
     echo "No orphan MCP processes found"
